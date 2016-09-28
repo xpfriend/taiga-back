@@ -21,6 +21,8 @@
 import re
 import markdown
 
+from django.conf import settings
+
 from markdown.treeprocessors import Treeprocessor
 
 from taiga.front.templatetags.functions import resolve
@@ -37,6 +39,7 @@ class TargetBlankLinkExtension(markdown.Extension):
 class TargetBlankLinksTreeprocessor(Treeprocessor):
     def run(self, root):
         home_url = resolve("home")
+        media_url = settings.MEDIA_URL
         links = root.getiterator("a")
         for a in links:
             href = a.get("href", "")
@@ -44,5 +47,5 @@ class TargetBlankLinksTreeprocessor(Treeprocessor):
             if url.endswith("/"):
                 url = url[:-1]
 
-            if not url.startswith(home_url):
+            if not url.startswith(home_url) or url.startswith(media_url):
                 a.set("target", "_blank")
